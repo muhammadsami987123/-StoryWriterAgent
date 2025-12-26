@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StoryWriterAgent - AI Creative Writing Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">✨</span>
+                <h1>StoryWriterAgent</h1>
+            </div>
+            <p class="tagline">AI-Powered Creative Writing Assistant</p>
+            <p class="subtitle">
+                <span>🚀</span>
+                Day 36 of #100DaysOfAI-Agents by Muhammad Sami
+            </p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Story Generation Form -->
+            <section class="form-section">
+                <div class="card-header">
+                    <h2><span class="icon">🪄</span> Create Your Story</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="prompt">Your Story Idea</label>
+                        <textarea id="prompt" placeholder="Enter your story idea... (e.g., A dragon who wanted to become a chef)" rows="4"></textarea>
+                    </div>
+
+                    <div class="options-grid">
+                        <div class="form-group">
+                            <label for="genre">Genre</label>
+                            <select id="genre">
+                                {% for genre in genres %}
+                                <option value="{{ genre }}">{{ genre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tone">Tone</label>
+                            <select id="tone">
+                                {% for tone in tones %}
+                                <option value="{{ tone }}">{{ tone }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="length">Length</label>
+                            <select id="length">
+                                {% for key, value in lengths.items() %}
+                                <option value="{{ key }}" {% if key == 'medium' %}selected{% endif %}>{{ value.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="language">Language</label>
+                            <select id="language">
+                                {% for lang in languages %}
+                                <option value="{{ lang }}">{{ lang }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <button id="generateBtn" class="btn btn-primary">
+                        <span class="btn-text">✨ Generate Story</span>
+                        <span class="btn-loading" style="display: none;">
+                            <span class="loading-spinner"></span>
+                            Generating...
+                        </span>
+                    </button>
+
+                    <!-- Example Prompts -->
+                    <div class="examples">
+                        <p class="examples-title">💡 Need inspiration? Try these:</p>
+                        <div class="examples-list">
+                            {% for example in examples %}
+                            <button class="example-btn" data-prompt="{{ example }}">{{ example }}</button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Story Output -->
+            <section class="output-section" id="outputSection" style="display: none;">
+                <div class="output-header">
+                    <h2><span class="icon">📖</span> Your Story</h2>
+                    <div class="output-actions">
+                        <button id="favoriteBtn" class="btn btn-icon" title="Add to favorites">☆</button>
+                        <button id="copyBtn" class="btn btn-icon" title="Copy to clipboard">📋</button>
+                        <button id="downloadBtn" class="btn btn-icon" title="Download">💾</button>
+                        <button id="expandBtn" class="btn btn-icon" title="Expand">⛶</button>
+                        <button id="newStoryBtn" class="btn btn-secondary">+ New Story</button>
+                    </div>
+                </div>
+                <div class="story-meta" id="storyMeta"></div>
+                <div class="story-content markdown" id="storyContent"></div>
+            </section>
+
+            <!-- Story Library -->
+            <section class="library-section">
+                <div class="library-header">
+                    <h2><span class="icon">📚</span> Story Library</h2>
+                    <div class="library-actions">
+                        <input type="text" id="searchInput" placeholder="🔍 Search stories..." class="search-input">
+                        <button id="showFavoritesBtn" class="btn btn-secondary">⭐ Favorites</button>
+                        <button id="showStatsBtn" class="btn btn-secondary">📊 Statistics</button>
+                    </div>
+                </div>
+                <div class="stories-grid" id="storiesList">
+                    <div class="empty-message">
+                        <div class="empty-icon">📝</div>
+                        <p>No stories yet. Generate your first story!</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Stats Modal -->
+        <div class="modal" id="statsModal" style="display: none;">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h3><span class="icon">📊</span> Writing Statistics</h3>
+                    <button class="modal-close" id="closeStatsBtn">&times;</button>
+                </div>
+                <div class="modal-body" id="statsContent"></div>
+            </div>
+        </div>
+
+        <!-- Story View Modal -->
+        <div class="modal" id="storyModal" style="display: none;">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h3 id="storyModalTitle"><span class="icon">📖</span> View Story</h3>
+                    <button class="modal-close" id="closeStoryBtn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="story-view-meta" id="storyModalMeta"></div>
+                    <div class="story-view-content markdown" id="storyModalContent"></div>
+                </div>
+                <div class="modal-footer">
+                    <button id="modalFavBtn" class="btn btn-secondary">⭐ Favorite</button>
+                    <button id="modalCopyBtn" class="btn btn-secondary">📋 Copy</button>
+                    <button id="modalDownloadBtn" class="btn btn-primary">💾 Download</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Made with ❤️ by Muhammad Sami | #100DaysOfAI-Agents</p>
+            <div class="keyboard-shortcuts">
+                <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Generate</span>
+                <span><kbd>Ctrl</kbd>+<kbd>S</kbd> Save</span>
+                <span><kbd>Ctrl</kbd>+<kbd>N</kbd> New</span>
+                <span><kbd>Esc</kbd> Close Modal</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
