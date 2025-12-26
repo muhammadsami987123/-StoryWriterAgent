@@ -17,20 +17,26 @@ class StoryAgent:
         self.stories = self._load_stories()
 
     def _load_stories(self) -> list:
-        """Load stories from storage"""
-        if os.path.exists(Config.STORIES_FILE):
-            try:
+        """Load stories from storage (in-memory for cloud deployment)"""
+        # For cloud deployment, use in-memory storage
+        # Stories won't persist between restarts on free tier
+        try:
+            if os.path.exists(Config.STORIES_FILE):
                 with open(Config.STORIES_FILE, 'r', encoding='utf-8') as f:
                     return json.load(f)
-            except (json.JSONDecodeError, IOError):
-                return []
+        except (json.JSONDecodeError, IOError, PermissionError):
+            pass
         return []
 
     def _save_stories(self):
         """Save stories to storage"""
-        os.makedirs(Config.STORIES_DIR, exist_ok=True)
-        with open(Config.STORIES_FILE, 'w', encoding='utf-8') as f:
-            json.dump(self.stories, f, ensure_ascii=False, indent=2)
+        try:
+            os.makedirs(Config.STORIES_DIR, exist_ok=True)
+            with open(Config.STORIES_FILE, 'w', encoding='utf-8') as f:
+                json.dump(self.stories, f, ensure_ascii=False, indent=2)
+        except (IOError, PermissionError):
+            # On cloud platforms, file storage may not be available
+            pass
 
     def _build_prompt(self, user_prompt: str, genre: str, tone: str,
                       length: str, language: str) -> str:
