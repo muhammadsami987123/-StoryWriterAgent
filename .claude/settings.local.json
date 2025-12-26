@@ -3,7 +3,11 @@
     "allow": [
       "WebFetch(domain:github.com)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial commit: StoryWriterAgent - AI Creative Writing Assistant\n\nFeatures:\n- AI story generation with OpenAI GPT-4\n- 6 genres, 4 tones, 3 lengths, 6 languages\n- Modern web UI with markdown rendering\n- Story library with favorites, search, export\n- Terminal and quick CLI modes\n- Typewriter animation effects\n\nDay 36 of #100DaysOfAI-Agents\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git remote add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)"
     ]
   }
 }

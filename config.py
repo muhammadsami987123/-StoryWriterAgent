@@ -16,7 +16,7 @@ class Config:
     PORT = int(os.getenv("PORT", 8036))
 
     # Story Configuration
-    GENRES = ["Fantasy", "Sci-Fi", "Mystery", "Romance", "Horror", "Children's"]
+    GENRES = ["Fantasy", "Sci-Fi", "Mystery", "Romance", "Horror", "Children's", "Success", "Struggle", "Adventure", "Thriller", "Comedy", "Drama"]
     TONES = ["Serious", "Funny", "Inspirational", "Dramatic"]
     LENGTHS = {
         "short": {"min": 100, "max": 300, "label": "Short (100-300 words)"},
